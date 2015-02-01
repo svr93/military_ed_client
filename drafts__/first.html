@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      "use strict";
+
+      function init() {
+        // settings for all document
+
+        initCanvasDrawingSettings();
+      }
+
+      (function() {
+        var ctx = null;
+
+        var earthCenter = {};
+        var earthRadius = null;
+
+        var satellites = [];
+
+        window.initCanvasDrawingSettings = function() {
+          ctx = cnv.getContext('2d');
+
+          /*
+
+          Y_
+          |\
+            \
+             \------> X
+             |
+             |
+             |
+             V
+             Z
+
+          */
+
+          earthCenter.X = cnv.width / 2;
+          earthCenter.Y = Math.min(cnv.width, cnv.height);
+          earthCenter.Z = cnv.height / 2;
+
+          earthRadius = 0.8 * Math.min(cnv.width, cnv.height);
+
+          getSatellitesInfo();
+        }
+
+        function getSatellitesInfo() {
+          // AJAX or Websockets
+
+          var params = {};
+
+          params.width = 1;
+          params.height = 1;
+          params.orbRadius = 0.9 * Math.min(cnv.width, cnv.height) / 2;
+
+          satellites.push(new Satellite(params));
+
+          drawSatellites();
+        }
+
+        function drawSatellites() {
+          for (var i = 0; i < satellites.length; ++i) {
+
+            setSatellitePixels(satellites[i].params.orbRadius,
+            satellites[i].orbitImg.data);
+
+            ctx.putImageData(satellites[i].orbitImg, 0, 0);
+          }
+        }
+
+        function setSatellitePixels(orbRadius, pixelsArr) {
+          var d = orbRadius * 2;
+          
+          // is it required to use setTimeout in drawing process?
+
+          for (var i = 0; i < cnv.height; ++i) {
+            for (var j = 0; j < cnv.width; ++j) {
+
+              pixelsArr[(i * cnv.width + j) * 4] = 255;
+              pixelsArr[(i * cnv.width + j) * 4 + 1] = 0;
+              pixelsArr[(i * cnv.width + j) * 4 + 2] = 0;
+              pixelsArr[(i * cnv.width + j) * 4 + 3] = 255;
+            }
+          }
+        }
+
+        function Satellite(params) {
+          this.params = params;
+          this.img = ctx.createImageData(params.width, params.height);
+          this.orbitImg = ctx.createImageData(cnv.width, cnv.height);
+        }
+
+      }());
+    </script>
+  </head>
+  <body onload="init()">
+    <canvas id="cnv" width="400" height="300"></canvas>
+  </body>
+</html>
