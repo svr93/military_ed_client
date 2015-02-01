@@ -3,23 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      canvas {
-        border: 2px solid black;
-      }
-    </style>
+
+    <link rel="stylesheet" href="css/main.css">
+
     <script src="js/drawer.js"></script>
     <script>
       "use strict"; // is not supported in IE9
 
       function init() {
-        // settings for all document
-
         initCanvasDrawingSettings();
       }
     </script>
   </head>
   <body onload="init()">
     <canvas id="cnv" width="800" height="400"></canvas>
+    <div id="buttonContainer">
+      <button style="display:block; width:100%" onclick="drawSatellites(-Math.PI/12, 0)">&and;</button>
+      <button style="width:50%" onclick="drawSatellites(0, Math.PI/12)">&lt;</button><!--
+    --><button style="width:50%" onclick="drawSatellites(0, -Math.PI/12)">&gt;</button>
+      <button style="display:block; width:100%" onclick="drawSatellites(Math.PI/12, 0)">&or;</button>
+    </div>
   </body>
 </html>

@@ -1,133 +1,128 @@
 (function() {
-        var ctx = null;
+  var ctx = null;
 
-        var earthCenter = {};
-        var earthRadius = null;
+  var earthCenter = {};
+  var earthRadius = null;
 
-        var satellites = [];
+  var satellites = [];
 
-        var delta = 0; // to correct the discretization problem
+  var delta = 0; // to correct the discretization problem
 
-        window.initCanvasDrawingSettings = function() {
-          ctx = cnv.getContext('2d');
+  var orbiteAngle = {
+    X: 0,
+    Y: 0,
+    Z: 0
+  }
 
-          /*
+  window.initCanvasDrawingSettings = function() {
+    ctx = cnv.getContext('2d');
 
-          Y_
-          |\
-            \
-             \------> X
-             |
-             |
-             |
-             V
-             Z
+    /*
 
-          */
+    Y_
+    |\
+      \
+       \------> X
+       |
+       |
+       |
+       V
+       Z
 
-          earthCenter.X = cnv.width / 2;
-          earthCenter.Y = Math.min(cnv.width, cnv.height) / 2;
-          earthCenter.Z = cnv.height / 2;
+    */
 
-          earthRadius = 50;
+    earthCenter.X = cnv.width / 2;
+    earthCenter.Y = 0;
+    earthCenter.Z = cnv.height / 2;
 
-          getSatellitesInfo();
-        }
+    earthRadius = 50;
 
-        function getSatellitesInfo() {
-          // AJAX or WebSockets
+    delta = 0.01;
 
-          var params = {};
+    getSatellitesInfo();
+  }
 
-          params.width = 1;
-          params.height = 1;
-          params.orbRadius = 180;
+  function getSatellitesInfo() {
+    // AJAX or WebSockets
 
-          createSatellites(0, params);
-        }
+    var params = {
+      width: 1,
+      height: 1,
+      orbRadius: 180
+    }
 
-        function createSatellites(id, params) {
-          satellites.push(new Satellite(id, params));
-          drawSatellites();
-        }
+    createSatellites(0, params);
+  }
 
-        function drawSatellites() {
-          setDrawingLimits();
+  function createSatellites(id, params) {
+    satellites.push(new Satellite(id, params));
+    drawSatellites(0, 0);
+  }
 
-          for (var i = 0; i < satellites.length; ++i) {
+  window.drawSatellites = function(deltaAngleX, deltaAngleZ) {
+    orbiteAngle.X += deltaAngleX;
+    orbiteAngle.Z += deltaAngleZ;
 
-            setSatellitePixels(satellites[i].params.orbRadius,
-            satellites[i].orbitImg.data);
+    for (var i = 0; i < satellites.length; ++i) {
+      satellites[i].orbitImg = ctx.createImageData(cnv.width, cnv.height);
 
-            ctx.putImageData(satellites[i].orbitImg, 0, 0);
-          }
-        }
+      setSatellitePixels(satellites[i].params.orbRadius,
+      satellites[i].orbitImg.data);
 
-        function setDrawingLimits() {
-          delta = 0.005;
-        }
+      ctx.putImageData(satellites[i].orbitImg, 0, 0);
+    }
+  }
 
-        function setSatellitePixels(orbRadius, pixelsArr) {
-          // is it required to use setTimeout in drawing process?
+  function setSatellitePixels(orbRadius, orbPixelsArr) {
+    // is it required to use setTimeout in drawing process?
 
-          var semiaxises = {};
-          var alpha = Math.PI / 3;
+    var semiaxises = {};
 
-          calculateParams(orbRadius, alpha, semiaxises);
+    calculateParams(orbRadius, semiaxises);
 
-          var tmp = 0;
+    var arrIdx = 0;
 
-          for (var i = 0; i < cnv.height; ++i) {
-            for (var j = 0; j < cnv.width; ++j) {
+    for (var i = 0; i < cnv.height; ++i) {
 
-              if (i < earthCenter.Z - orbRadius || 
-                  i > earthCenter.Z + orbRadius ||
-                  j < earthCenter.X - orbRadius ||
-                  j > earthCenter.X + orbRadius) continue;
+      if (i < earthCenter.Z - orbRadius || i > earthCenter.Z + orbRadius )
+        continue;
 
-              /*if (Math.pow(earthCenter.X - j, 2) + 
-                  Math.pow(earthCenter.Z - i, 2) <
-                  Math.pow(orbRadius - delta, 2) ||
+      for (var j = 0; j < cnv.width; ++j) {
 
-                  Math.pow(earthCenter.X - j, 2) + 
-                  Math.pow(earthCenter.Z - i, 2) >
-                  Math.pow(orbRadius + delta, 2)) continue;*/
+        if (j < earthCenter.X - orbRadius || j > earthCenter.X + orbRadius)
+          continue;
 
-              if ((Math.pow(j - earthCenter.X, 2) / Math.pow(semiaxises.a, 2) +
-                  Math.pow(i - earthCenter.Z, 2) / Math.pow(semiaxises.b, 2)
-                  < 1 - delta) ||
+        var tmp = Math.pow(j - earthCenter.X, 2) / Math.pow(semiaxises.a, 2) +
+                  Math.pow(i - earthCenter.Z, 2) / Math.pow(semiaxises.b, 2);
 
-                  (Math.pow(j - earthCenter.X, 2) / Math.pow(semiaxises.a, 2) +
-                  Math.pow(i - earthCenter.Z, 2) / Math.pow(semiaxises.b, 2)
-                  > 1 + delta)) continue;
+        if (tmp < 1 - delta || tmp > 1 + delta) continue;
 
-              tmp = (i * cnv.width + j) * 4;
+        arrIdx = (i * cnv.width + j) * 4;
 
-              pixelsArr[tmp] = 0;
-              pixelsArr[tmp + 1] = 0;
-              pixelsArr[tmp + 2] = 0;
-              pixelsArr[tmp + 3] = 255;
+        orbPixelsArr[arrIdx] = 0;
+        orbPixelsArr[arrIdx + 1] = 255;
+        orbPixelsArr[arrIdx + 2] = 0;
+        orbPixelsArr[arrIdx + 3] = 255;
+      }
+    }
+  }
 
-              console.log(true);
-            }
-          }
+  function calculateParams(orbRadius, semiaxises) {
+    // X, Z rotate
 
-        }
+    semiaxises.b = orbRadius * Math.cos(orbiteAngle.X);
+    semiaxises.a = orbRadius * Math.cos(orbiteAngle.Z);
+  }
 
-        function calculateParams(orbRadius, alpha, semiaxises) {
-          // X rotate
-          semiaxises.a = orbRadius;
-          semiaxises.b = orbRadius * Math.sin(alpha);
-        }
+  function Satellite(id, params) {
+    Object.defineProperty(this, "id", {
+      value: id,
+      writable: false
+    });
 
-        function Satellite(id, params) {
-          Object.defineProperty(this, "id", {
-            value: id,
-            writable: false
-          });
+    this.params = params;
+    this.img = ctx.createImageData(params.width, params.height);
+    this.orbitImg = ctx.createImageData(cnv.width, cnv.height);
+  }
 
-          this.params = params;
-          this.img = ctx.createImageData(params.width, params.height);
-          this.orbitImg = ctx.createImageData(cnv.width, cnv.height);
-        }
 }());
