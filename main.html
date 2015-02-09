@@ -7,17 +7,22 @@
     <link rel="stylesheet" href="css/main.css">
 
     <script src="js/tests.js"></script>
-    <script src="js/drawer.js"></script>
+    <script src="js/earthDrawer.js"></script>
+    <script src="js/satellitesDrawer.js"></script>
     <script>
       "use strict"; // is not supported in IE9
 
       function init() {
-        initCanvasDrawingSettings();
+        initEarthDrawingSettings();
+        // drawEarth();
+
+        initSatellitesDrawingSettings();
       }
     </script>
   </head>
   <body onload="init()">
-    <canvas id="cnv"></canvas>
+    <canvas id="earthCnv"></canvas><!--
+  --><canvas id="stlCnv"></canvas>
     <div id="buttonContainer">
       <button style="display:block; width:100%" onclick="drawSatellite(-Math.PI/12, 0, 0)">&and;</button>
       <button style="width:50%" onclick="drawSatellite(0, 0, Math.PI/12)">&lt;</button><!--

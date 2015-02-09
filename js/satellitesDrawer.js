@@ -10,14 +10,14 @@
 
   var delta = null; // to correct the discretization problem
 
-  window.initCanvasDrawingSettings = function() {
-    cnv.width = 800;
-    cnv.height = 400;
-    primaryCtx = cnv.getContext("2d");
+  window.initSatellitesDrawingSettings = function() {
+    stlCnv.width = 600;
+    stlCnv.height = 400;
+    primaryCtx = stlCnv.getContext("2d");
 
     slaveCnv = document.createElement("canvas");
-    slaveCnv.width = cnv.width;
-    slaveCnv.height = cnv.height;
+    slaveCnv.width = stlCnv.width;
+    slaveCnv.height = stlCnv.height;
     slaveCtx = slaveCnv.getContext("2d");
 
     /*
@@ -34,8 +34,8 @@
 
     */
 
-    earthCenter.X = cnv.width / 2;
-    earthCenter.Z = cnv.height / 2;
+    earthCenter.X = stlCnv.width / 2;
+    earthCenter.Z = stlCnv.height / 2;
 
     delta = 0.01;
 
@@ -82,10 +82,10 @@
     setSatelliteImg(satellite);
 
     primaryCtx.save();
-    primaryCtx.clearRect(0, 0, cnv.width, cnv.height);
-    primaryCtx.translate(cnv.width / 2, cnv.height / 2);
+    primaryCtx.clearRect(0, 0, stlCnv.width, stlCnv.height);
+    primaryCtx.translate(stlCnv.width / 2, stlCnv.height / 2);
     primaryCtx.rotate(satellite.orb.angles.Y);
-    primaryCtx.drawImage(slaveCnv, -cnv.width / 2, -cnv.height / 2);
+    primaryCtx.drawImage(slaveCnv, -stlCnv.width / 2, -stlCnv.height / 2);
     primaryCtx.restore();
   }
 
