@@ -53,11 +53,13 @@
 
       console.log("Параметры приняты...");
       // temporary !!!
-      params.orbRadius = this.response[0].height / 5000 | 0;
+      var resp = JSON.parse(this.response);
+
+      params.orbRadius = resp[0].height / 5000 | 0;
       params.img = new Image();
       params.img.src = "img/satellite.png";
 
-      var id = this.response[0].id;
+      var id = resp[0].id;
 
       satellites.length = 0;
       createSatellite(id, params);
