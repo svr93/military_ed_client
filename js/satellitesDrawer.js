@@ -53,7 +53,7 @@
 
       console.log("Параметры приняты...");
       // temporary !!!
-      params.orbRadius = this.response[0].height;
+      params.orbRadius = this.response[0].height / 5000 | 0;
       params.img = new Image();
       params.img.src = "img/satellite.png";
 
