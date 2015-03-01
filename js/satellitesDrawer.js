@@ -43,19 +43,28 @@
   }
 
   function getSatellitesInfo() {
-    // AJAX or WebSockets
+    console.log("Получаем параметры...");
+    var params = {};
 
-    // for() {
-      var params = {};
-      params.orbRadius = 180;
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+      if (this.readyState != 4 || this.status != 200) return;
+
+      console.log("Параметры приняты...");
+      // temporary !!!
+      params.orbRadius = this.response[0].height;
       params.img = new Image();
       params.img.src = "img/satellite.png";
 
-      var id = Math.random(); // id from DB
+      var id = this.response[0].id;
 
       satellites.length = 0;
       createSatellite(id, params);
-    // }
+    }
+
+    xhr.open("GET", "/info");
+    xhr.send();
   }
 
   function createSatellite(id, params) {
