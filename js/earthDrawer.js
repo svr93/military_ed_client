@@ -4,7 +4,10 @@
   var d = null;
   var dh = null;
 
-  var ctx = null;
+  var earthCtx = null;
+
+  var bufferCnv = null;
+  var bufferCtx = null;
 
   var img = null;
   var imgData = null;
@@ -18,22 +21,26 @@
   var gaussImgDiff = null;
 
   window.initEarthDrawingSettings = function() {
-    earthCnv.width = 600;
-    earthCnv.height = earthCnv.width / 2;
+    bufferCnv = document.createElement("canvas");
+    bufferCnv.width = 600;
+    bufferCnv.height = bufferCnv.width / 2;
+    bufferCtx = bufferCnv.getContext("2d");
 
-    d2 = earthCnv.width;
+    d2 = bufferCnv.width;
     d = d2 / 2;
     dh = d2 / 4;
 
     gaussPartWidth = d2 / GAUSS_PARTS_NUM;
 
-    ctx = earthCnv.getContext("2d");
+    earthCnv.width = bufferCnv.width / 2;
+    earthCnv.height = bufferCnv.height;
+    earthCtx = earthCnv.getContext("2d");
 
     img = new Image();
 
     img.onload = function() {
-      ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, d2, d);
-      imgData = ctx.getImageData(0, 0, d2, d);
+      bufferCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, d2, d);
+      imgData = bufferCtx.getImageData(0, 0, d, d);
       imgArr = imgData.data;
 
       drawEarth();
@@ -46,8 +53,8 @@
     createHemisphereImgArr();
     setGrid();
 
-    ctx.clearRect(0, 0, d2, d);
-    ctx.putImageData(imgData, 0, 0);
+    earthCtx.clearRect(0, 0, d, d);
+    earthCtx.putImageData(imgData, 0, 0);
   }
 
   function createHemisphereImgArr() {
@@ -72,7 +79,7 @@
   }
 
   function checkHemisphereValues(i, j) {
-    var cnvPos = i * d2 + j;
+    var cnvPos = i * d + j;
 
     if (Math.abs(dh - j) < gaussPartsNumQuarter * imgIntervalWidth) {
 
