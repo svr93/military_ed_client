@@ -12,7 +12,7 @@
 
   window.initSatellitesDrawingSettings = function() {
     stlCnv.width = 600;
-    stlCnv.height = 400;
+    stlCnv.height = 300;
     primaryCtx = stlCnv.getContext("2d");
 
     slaveCnv = document.createElement("canvas");
@@ -43,7 +43,7 @@
   }
 
   function getSatellitesInfo() {
-    console.log("Получаем параметры...");
+    /* console.log("Получаем параметры...");
     var params = {};
 
     var xhr = new XMLHttpRequest();
@@ -66,7 +66,17 @@
     }
 
     xhr.open("GET", "/info");
-    xhr.send();
+    xhr.send(); */
+
+    var params = {};
+
+    params.orbRadius = 100;
+    
+    params.img = new Image();
+    params.img.onload = function() {
+      createSatellite(0, params);
+    }
+    params.img.src = "img/satellite.png";
   }
 
   function createSatellite(id, params) {

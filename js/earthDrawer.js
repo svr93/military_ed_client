@@ -1,10 +1,8 @@
 (function() {
-  var h = null;
-  var hh = null;
 
-  var w = null;
-  var wh = null;
-  var wq = null;
+  var d2 = null;
+  var d = null;
+  var dh = null;
 
   var ctx = null;
 
@@ -12,123 +10,101 @@
   var imgData = null;
   var imgArr = [];
 
-  var GAUSS_PARTS_NUM = 32;
+  var GAUSS_PARTS_NUM = 256; // GAUSS_PARTS_NUM % 4 == 0 (projection precision)
+  var gaussPartsNumQuarter = GAUSS_PARTS_NUM / 4;
+
+  var gaussPartWidth = null;
+  var imgIntervalWidth = null;
+  var gaussImgDiff = null;
 
   window.initEarthDrawingSettings = function() {
     earthCnv.width = 600;
-    earthCnv.height = 400;
+    earthCnv.height = earthCnv.width / 2;
 
-    h = earthCnv.height;
-    hh = h / 2;
+    d2 = earthCnv.width;
+    d = d2 / 2;
+    dh = d2 / 4;
 
-    w = earthCnv.width;
-    wh = w / 2;
-    wq = w / 4;
+    gaussPartWidth = d2 / GAUSS_PARTS_NUM;
 
     ctx = earthCnv.getContext("2d");
 
     img = new Image();
-    img.src = "img/earth.jpg";
 
     img.onload = function() {
-      ctx.drawImage(img, 0, 0, img.width, img.height,
-                         0, 0, w, h);
-      imgData = ctx.getImageData(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, d2, d);
+      imgData = ctx.getImageData(0, 0, d2, d);
       imgArr = imgData.data;
 
-      correctImageData();
+      drawEarth();
+    }
+
+    img.src = "img/earth.jpg";
+  }
+
+  function drawEarth() {
+    createHemisphereImgArr();
+    setGrid();
+
+    ctx.clearRect(0, 0, d2, d);
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  function createHemisphereImgArr() {
+
+    for (var i = 0; i < d; ++i) {
+
+      imgIntervalWidth = 
+      Math.sqrt(Math.pow(dh, 2) - Math.pow(Math.abs(dh - i), 2)) /
+      gaussPartsNumQuarter;
+
+      gaussImgDiff = gaussPartWidth - imgIntervalWidth;
+
+      for (var j = dh; j >= 0; --j) {
+        checkHemisphereValues(i, j);
+      }
+      
+      for (var j = dh; j <= d; ++j) {
+        checkHemisphereValues(i, j);
+      }
+
     }
   }
 
-  function correctImageData() {
-    var idx = null;
+  function checkHemisphereValues(i, j) {
+    var cnvPos = i * d2 + j;
 
-    var gaussPartWidth = w / GAUSS_PARTS_NUM;
-    var gaussPartWidthHalf = gaussPartWidth / 2;
+    if (Math.abs(dh - j) < gaussPartsNumQuarter * imgIntervalWidth) {
 
-    var k = gaussPartWidth / h;
+      // simplified calculation (tmp)
 
-    // correct the top of map (Gauss division)
+      var tmp = gaussImgDiff * (Math.abs(dh - j) / imgIntervalWidth | 0) | 0;
+      var shift = j < dh ? -tmp : tmp;
 
-    for (var i = 0; i < hh; ++i) {
-      for (var j = 0; j < wh; ++j) {
-
-        var pos = j % gaussPartWidth;
-        var imgIntervalWidthHalf = k * i;
-
-        if (pos > gaussPartWidthHalf - imgIntervalWidthHalf && 
-            pos < gaussPartWidthHalf + imgIntervalWidthHalf) continue;
-
-        idx = (i * w + j) * 4;
-        
-        imgArr[idx] = 255;
-        imgArr[idx + 1] = 255;
-        imgArr[idx + 2] = 255;
-        imgArr[idx + 3] = 255;
-      }
+      imgArr[cnvPos * 4] = imgArr[(cnvPos + shift) * 4];
+      imgArr[cnvPos * 4 + 1] = imgArr[(cnvPos + shift) * 4 + 1];
+      imgArr[cnvPos * 4 + 2] = imgArr[(cnvPos + shift) * 4 + 2];
+      imgArr[cnvPos * 4 + 3] = imgArr[(cnvPos + shift) * 4 + 3];
+    } else {
+      setWhiteColor(cnvPos);
     }
+  }
 
-    // correct the bottom of map (Gauss division)
-
-    for (var i = hh; i < h; ++i) {
-      for (var j = 0; j < wh; ++j) {
-
-        var pos = j % gaussPartWidth;
-        var imgIntervalWidthHalf = k * (h - i);
-
-        if (pos > gaussPartWidthHalf - imgIntervalWidthHalf && 
-            pos < gaussPartWidthHalf + imgIntervalWidthHalf) continue;
-
-        idx = (i * w + j) * 4;
-        
-        imgArr[idx] = 255;
-        imgArr[idx + 1] = 255;
-        imgArr[idx + 2] = 255;
-        imgArr[idx + 3] = 255;
-      }
+  function setWhiteColor(cnvPos) {
+    for (var i = 0; i < 4; ++i) {
+      imgArr[cnvPos * 4 + i] = 255;
     }
-
-    // correct the top of map (make shifts)
-
-    var gaussPartsNumQuarter = GAUSS_PARTS_NUM / 4;
-
-    for (var i = 0; i < hh; ++i) {
-      var imgIntervalWidth = k * i * 2;
-
-      for (var j = wq; j >= 0; --j) {
-        var cnvPos = i * w + j;
-
-        if (j > wq - gaussPartsNumQuarter * imgIntervalWidth) {
-          var shift = k * (hh - i) | 0;
-
-          imgArr[cnvPos * 4] = imgArr[(cnvPos - shift) * 4];
-          imgArr[cnvPos * 4 + 1] = imgArr[(cnvPos - shift) * 4 + 1];
-          imgArr[cnvPos * 4 + 2] = imgArr[(cnvPos - shift) * 4 + 2];
-          imgArr[cnvPos * 4 + 3] = imgArr[(cnvPos - shift) * 4 + 3];
-        } else {
-          imgArr[cnvPos * 4] = 255;
-          imgArr[cnvPos * 4 + 1] = 255;
-          imgArr[cnvPos * 4 + 2] = 255;
-          imgArr[cnvPos * 4 + 3] = 255;
-        }
-      }
-    }
-
-    setGrid();
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.putImageData(imgData, 0, 0);
   }
 
   function setGrid() {
 
-    for (var i = 0; i < h; ++i) {
+    for (var i = 0; i < d; ++i) {
       for (var j = 1; j < 4; ++j) {
 
-        imgArr[(i * w + j * wq) * 4] = 0;
-        imgArr[(i * w + j * wq) * 4 + 1] = 0;
-        imgArr[(i * w + j * wq) * 4 + 2] = 0;
-        imgArr[(i * w + j * wq) * 4 + 3] = 255;
+        imgArr[(i * d2 + j * dh) * 4] = 0;
+        imgArr[(i * d2 + j * dh) * 4 + 1] = 0;
+        imgArr[(i * d2 + j * dh) * 4 + 2] = 0;
+        imgArr[(i * d2 + j * dh) * 4 + 3] = 255;
       }
     }
   }
