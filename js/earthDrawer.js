@@ -20,6 +20,9 @@
   var imgData = null;
   var imgArr = [];
 
+  var INITIAL_SCALE = 0.5;
+  var currScale = INITIAL_SCALE;
+
   var GAUSS_PARTS_NUM = 256; // GAUSS_PARTS_NUM % 4 == 0 (projection precision)
   var gaussPartsNumQuarter = GAUSS_PARTS_NUM / 4;
 
@@ -44,12 +47,6 @@
 
     document.body.appendChild(bufferCnv);
 
-    d2 = bufferCnv.width;
-    d = d2 / 2;
-    r = d2 / 4;
-
-    gaussPartWidth = d2 / GAUSS_PARTS_NUM;
-
     earthCnv.width = bufferCnv.width / 2;
     earthCnv.height = bufferCnv.height;
     earthCtx = earthCnv.getContext("2d");
@@ -60,18 +57,42 @@
 
       currPos = COMMON_STEP / 2;
 
+      setScaleSettings(INITIAL_SCALE);
+
       setInterval(function() {
         window.requestAnimationFrame(drawEarth);
       }, DELAY_TIME);
     }
 
     img.src = "img/earth.jpg";
+
+    window.changeScale = function (scaleDelta) {
+      var newScale = currScale + scaleDelta;
+
+      if (newScale > 1 || newScale < 0.1) return;
+
+      newScale = Math.round(newScale * 10) / 10;
+      setScaleSettings(newScale);
+    };
+  }
+
+  function setScaleSettings(newScale) {
+    currScale = newScale;
+
+    d2 = currScale * bufferCnv.width;
+    d = d2 / 2;
+    r = d2 / 4;
+
+    gaussPartWidth = d2 / GAUSS_PARTS_NUM;
+
+    bufferCtx.clearRect(0, 0, bufferCnv.width, bufferCnv.height);
+    earthCtx.clearRect(0, 0, earthCnv.width, earthCnv.height);
   }
 
   function drawEarth() {
 
     imgShift = img.width * currPos / 100 | 0;
-    cnvShift = bufferCnv.width * currPos / 100 | 0;
+    cnvShift = currScale * bufferCnv.width * currPos / 100 | 0;
 
     bufferCtx.clearRect(0, 0, d2, d);
 
