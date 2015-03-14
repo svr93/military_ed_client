@@ -38,6 +38,8 @@
 
   var DELAY_TIME = 50;
 
+  var needClearAllEarthCanvas = false;
+
   window.initEarthDrawingSettings = function() {
 
     bufferCnv = document.createElement("canvas");
@@ -85,8 +87,7 @@
 
     gaussPartWidth = d2 / GAUSS_PARTS_NUM;
 
-    bufferCtx.clearRect(0, 0, bufferCnv.width, bufferCnv.height);
-    earthCtx.clearRect(0, 0, earthCnv.width, earthCnv.height);
+    needClearAllEarthCanvas = true;
   }
 
   function drawEarth() {
@@ -106,9 +107,18 @@
     imgArr = imgData.data;
 
     createHemisphereImgArr();
-    
-    earthCtx.clearRect(0, 0, d, d);
-    earthCtx.putImageData(imgData, 0, 0);
+
+    if (!needClearAllEarthCanvas) {
+      earthCtx.clearRect(0, 0, d, d);
+    } else {
+      bufferCtx.clearRect(0, 0, bufferCnv.width, bufferCnv.height);
+      earthCtx.clearRect(0, 0, earthCnv.width, earthCnv.height);
+
+      needClearAllEarthCanvas = false;
+    }
+
+    earthCtx.putImageData(imgData, earthCnv.width / 2 - r,
+                                   earthCnv.height / 2 - r);
 
     currPos += COMMON_STEP;
 
