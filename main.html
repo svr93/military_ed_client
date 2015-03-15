@@ -1,23 +1,53 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Центр контроля</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, maximum-scale=0.67">
+
+    <style>
+      body {
+        text-align: center;
+      }
+      button {
+        height: 50px;
+        border-radius: 25px;
+      }
+      .container {
+        display: inline-block;
+        border: 2px solid green;
+      }
+    </style>
 
     <script>
-      // requirements: IE9+ or other browsers
+      // requirements: IE9+ or other modern browsers
 
       "use strict"; // is not supported in IE9
 
       var isSystemWorking = false;
 
-      function init() {
+      function init() { // main script onload
         initEarthDrawingSettings();
 
-        startButton.style.display = "block";
+        document.addEventListener("DOMContentLoaded", function() {
+          buttonContainer.style.display = "block";
+
+          reduceScale.onclick = function() {
+            changeScale(-0.05);
+          };
+
+          increaseScale.onclick = function() {
+            changeScale(0.05);
+          };
+
+          startButton.onclick = function() {
+            begin();
+          };
+
+        });
       }
 
-      function begin() {
+      function begin() { // startButton onclick
         var xhr = new XMLHttpRequest();
 
         xhr.onreadystatechange = function() {
@@ -37,15 +67,23 @@
     <script defer src="js/satellitesDrawer-2.0.js"></script>
     <script defer src="js/earthDrawer.js" onload="init()"></script>
   </head>
+
   <body>
-    <canvas id="earthCnv" style="display:inline-block; border:2px solid green"></canvas><!--
-  --><div id="info_block" style="display:inline-block; width:50%; height:250px; vertical-align:top; text-align:center; border:2px solid green"></div>
+    <canvas id="earthCnv" class="container"></canvas><!--
+  --><div class="container" style="width:500px; height:500px;
+      vertical-align:top">
 
-    <div style="margin:auto; width:20%">
-      <button style="width:50%" onclick="changeScale(-0.05)">scale-</button><!--
-    --><button style="width:50%" onclick="changeScale(0.05)">scale+</button>
+      <div id="info_block" style="height:50px"></div>
 
-      <button id="startButton" style="display:none; width:100%" onclick="begin()">Старт</button>
+      <div id="buttonContainer" style="display:none; margin:auto; width:50%">
+        <button id="reduceScale" style="width:50%">scale-</button><!--
+      --><button id="increaseScale" style="width:50%">scale+</button>
+        <br>
+        <br>
+        <button disabled="true" id="startButton" style="width:100%">
+          Старт
+        </button>
+      </div>
     </div>
   </body>
 </html>
