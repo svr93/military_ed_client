@@ -3,7 +3,6 @@
 
   /* TO DO:
     1) correct bug on the mobile devices;
-    2) make scaling;
 
   */
 
@@ -38,12 +37,10 @@
 
   var DELAY_TIME = 50;
 
-  var needClearAllEarthCanvas = false;
-
   window.initEarthDrawingSettings = function() {
 
     bufferCnv = document.createElement("canvas");
-    bufferCnv.width = 600;
+    bufferCnv.width = 1000;
     bufferCnv.height = bufferCnv.width / 2;
     bufferCtx = bufferCnv.getContext("2d");
 
@@ -73,7 +70,7 @@
 
       if (newScale > 1 || newScale < 0.1) return;
 
-      newScale = Math.round(newScale * 10) / 10;
+      newScale = Math.round(newScale * 100) / 100;
       setScaleSettings(newScale);
     };
   }
@@ -86,8 +83,6 @@
     r = d2 / 4;
 
     gaussPartWidth = d2 / GAUSS_PARTS_NUM;
-
-    needClearAllEarthCanvas = true;
   }
 
   function drawEarth() {
@@ -108,17 +103,12 @@
 
     createHemisphereImgArr();
 
-    if (!needClearAllEarthCanvas) {
-      earthCtx.clearRect(0, 0, d, d);
-    } else {
-      bufferCtx.clearRect(0, 0, bufferCnv.width, bufferCnv.height);
-      earthCtx.clearRect(0, 0, earthCnv.width, earthCnv.height);
-
-      needClearAllEarthCanvas = false;
-    }
+    earthCtx.clearRect(0, 0, earthCnv.width, earthCnv.height);
 
     earthCtx.putImageData(imgData, earthCnv.width / 2 - r,
                                    earthCnv.height / 2 - r);
+
+    drawSatellites(earthCnv, currPos, currScale);
 
     currPos += COMMON_STEP;
 
