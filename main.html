@@ -4,34 +4,48 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="css/main.css">
-
-    <script src="js/tests.js"></script>
-    <script src="js/earthDrawer.js"></script>
-    <script src="js/satellitesDrawer.js"></script>
     <script>
+      // requirements: IE9+ or other browsers
+
       "use strict"; // is not supported in IE9
+
+      var isSystemWorking = false;
 
       function init() {
         initEarthDrawingSettings();
-        // drawEarth();
 
-        initSatellitesDrawingSettings();
+        startButton.style.display = "block";
+      }
+
+      function begin() {
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function() {
+          if (this.readyState != 4 || this.status != 200) return;
+
+          alert("Система работает, начинаем получение координат...");
+          isSystemWorking = true;
+        }
+
+        xhr.open("GET",
+        "/ControlCenterService/fromControlCenter?latitude=34.5n&longitude=56.9e");
+
+        xhr.send();
       }
     </script>
+
+    <script defer src="js/satellitesDrawer-2.0.js"></script>
+    <script defer src="js/earthDrawer.js" onload="init()"></script>
   </head>
-  <body onload="init()">
-    <canvas id="earthCnv"></canvas><!--
-  --><canvas id="stlCnv"></canvas>
-    <div id="buttonContainer">
-      <button style="display:block; width:100%" onclick="drawSatellite(-Math.PI/12, 0, 0)">&and;</button>
-      <button style="width:50%" onclick="drawSatellite(0, 0, Math.PI/12)">&lt;</button><!--
-    --><button style="width:50%" onclick="drawSatellite(0, 0, -Math.PI/12)">&gt;</button>
-      <button style="display:block; width:100%" onclick="drawSatellite(Math.PI/12, 0, 0)">&or;</button>
-      <button style="width:50%" onclick="drawSatellite(0, -Math.PI/12, 0)">leftRotY</button><!--
-    --><button style="width:50%" onclick="drawSatellite(0, Math.PI/12, 0)">rightRotY</button>
-      <button style="width:50%" onclick="changeScale(0.1)">scale+</button><!--
-    --><button style="width:50%" onclick="changeScale(-0.1)">scale-</button>
+  <body>
+    <canvas id="earthCnv" style="display:inline-block; border:2px solid green"></canvas><!--
+  --><div id="info_block" style="display:inline-block; width:50%; height:250px; vertical-align:top; text-align:center; border:2px solid green"></div>
+
+    <div style="margin:auto; width:20%">
+      <button style="width:50%" onclick="changeScale(-0.05)">scale-</button><!--
+    --><button style="width:50%" onclick="changeScale(0.05)">scale+</button>
+
+      <button id="startButton" style="display:none; width:100%" onclick="begin()">Старт</button>
     </div>
   </body>
 </html>

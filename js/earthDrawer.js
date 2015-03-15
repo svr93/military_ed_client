@@ -44,7 +44,7 @@
     bufferCnv.height = bufferCnv.width / 2;
     bufferCtx = bufferCnv.getContext("2d");
 
-    document.body.appendChild(bufferCnv);
+    // document.body.appendChild(bufferCnv);
 
     earthCnv.width = bufferCnv.width / 2;
     earthCnv.height = bufferCnv.height;
