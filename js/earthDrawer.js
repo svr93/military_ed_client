@@ -68,9 +68,9 @@
     window.changeScale = function (scaleDelta) {
       var newScale = currScale + scaleDelta;
 
-      if (newScale > 1 || newScale < 0.1) return;
+      if (newScale > 1 || newScale < 0.05) return;
 
-      newScale = Math.round(newScale * 100) / 100;
+      newScale = Math.round(newScale * 1000) / 1000;
       setScaleSettings(newScale);
     };
   }
