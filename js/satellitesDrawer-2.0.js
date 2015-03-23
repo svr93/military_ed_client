@@ -17,7 +17,7 @@
 
   var objects = [ // temporary values; values be sorted for proper visibility
     {
-      radial_distance: 9429870,
+      radial_distance: 42371000,
       polar_angle: 0,
       azimuth_angle: Math.PI / 2
     },
