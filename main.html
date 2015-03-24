@@ -52,9 +52,9 @@
 
       function init() { // main script onload
 
-        initEarthDrawingSettings();
-
         document.addEventListener("DOMContentLoaded", function() {
+
+          initEarthDrawingSettings();
 
           reduceScale.onclick = function() {
             changeScale(-0.025);
