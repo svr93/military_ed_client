@@ -5,9 +5,27 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, maximum-scale=0.67">
 
+    <meta name="application-name" content="ControlCenter__v3.0">
+    <meta name="author" content="Vladimir Shamsheev, svr93@i.ua">
+
     <style>
       body {
         text-align: center;
+      }
+      header {
+        margin: auto;
+        width: 1204px;
+        height: 45px;
+        border: 2px solid green;
+      }
+      h1 {
+        margin: 10px;
+        font: bold 20px Arial;
+        text-transform: uppercase;
+        color: green;
+      }
+      form {
+        text-align: left;
       }
       button {
         height: 50px;
@@ -15,22 +33,28 @@
       }
       .container {
         display: inline-block;
+        vertical-align: top;
+        width: 600px;
+        height: 600px;
         border: 2px solid green;
+      }
+      .button-block {
+        height: 50px;
       }
     </style>
 
     <script>
-      // requirements: IE9+ or other modern browsers
+      // app requirements: IE9+ or other modern browsers
 
       "use strict"; // is not supported in IE9
 
       var isSystemWorking = false;
 
       function init() { // main script onload
+
         initEarthDrawingSettings();
 
         document.addEventListener("DOMContentLoaded", function() {
-          buttonContainer.style.display = "block";
 
           reduceScale.onclick = function() {
             changeScale(-0.025);
@@ -44,6 +68,14 @@
             begin();
           };
 
+          var containerArr = document.getElementsByClassName("container");
+
+          [].forEach.call(containerArr, function(item) {
+            item.style.display = "inline-block";
+          });
+
+          buttonContainer.style.display = "block";
+
         });
       }
 
@@ -55,7 +87,7 @@
 
           alert("Система работает, начинаем получение координат...");
           isSystemWorking = true;
-        }
+        };
 
         xhr.open("GET",
         "/ControlCenterService/fromControlCenter?latitude=34.5n&longitude=56.9e");
@@ -65,26 +97,61 @@
     </script>
 
     <script defer src="js/satellitesDrawer-2.0.js"></script>
-    <script defer src="js/earthDrawer.js" onload="init()"></script>
-    
+    <script defer src="js/earthDrawer.js"></script>
     <script defer src="js/angular.min.js"></script>
+    <script defer src="js/app.js" onload="init()"></script>
   </head>
 
-  <body>
-    <canvas id="earthCnv" class="container"></canvas><!--
-  --><div class="container" style="width:500px; height:500px;
-      vertical-align:top">
+  <body ng-app="app">
 
-      <div id="info_block" style="height:50px"></div>
+    <header>
+      <h1>Центр контроля космической обстановки</h1>
+    </header>
 
-      <div id="buttonContainer" style="display:none; margin:auto; width:50%">
-        <button id="reduceScale" style="width:50%">scale-</button><!--
-      --><button id="increaseScale" style="width:50%">scale+</button>
-        <br>
-        <br>
-        <button disabled="true" id="startButton" style="width:100%">
-          Старт
-        </button>
+    <div ng-controller="EarthViewController as ewc">
+      <canvas id="earthCnv" class="container" style="display:none"
+      ng-show="ewc.isSet(0)"></canvas><!--
+
+   --><canvas id="earth2DCnv" class="container" style="display:none"
+      ng-show="ewc.isSet(1)"></canvas><!--
+
+   --><div class="container" ng-show="ewc.isSet(2)">
+        <article>
+          <h2>Инструкция</h2>
+        </article>
+      </div><!--
+
+   --><div class="container">
+        <div id="info_block" style="height:50px"></div>
+
+        <div id="buttonContainer" style="display:none; margin:auto; width:50%">
+          <div class="button-block">
+            <button id="reduceScale" style="width:50%" ng-show="ewc.isSet(0)">
+              scale-
+            </button><!--
+
+         --><button id="increaseScale" style="width:50%" ng-show="ewc.isSet(0)">
+              scale+
+            </button>
+          </div>
+          <br>
+          <br>
+          <button disabled="true" id="startButton" style="width:100%">
+            Старт
+          </button>
+          <br>
+          <br>
+          <form>
+            <input type="radio" name="earthView" ng-model="ewc.view" value="0">
+              3D-изображение Земли
+            <br>
+            <input type="radio" name="earthView" ng-model="ewc.view" value="1">
+              2D-карта Земли
+            <br>
+            <input type="radio" name="earthView" ng-model="ewc.view" value="2">
+              Инструкция
+          </form>
+        </div>
       </div>
     </div>
   </body>
