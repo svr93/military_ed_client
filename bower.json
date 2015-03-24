@@ -1,7 +1,7 @@
 {
-  "name": "client",
-  "version": "0.0.0",
-  "homepage": "https://github.com/svr93/military_ed_client",
+  "name": "Control_center__frontend",
+  "version": "3.0.0",
+  "homepage": "https://github.com/svr93/military_ed_client_dev",
   "authors": [
     "Владимир <svr93@i.ua>"
   ],
