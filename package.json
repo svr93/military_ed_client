@@ -1,0 +1,22 @@
+{
+  "name": "Control_center__frontend",
+  "description": "The part of military project. IE9+ only. Framework: Angular.js",
+  "author": "Vladimir Shamsheev <svr93@i.ua>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/svr93/military_ed_client_dev"
+  },
+  "dependencies": {
+    "bower": "^1.3.12",
+    "gulp": "^3.8.11",
+    "gulp-closure-compiler-service": "^0.5.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-csslint": "^0.1.5",
+    "gulp-html-minifier": "^0.1.6",
+    "gulp-jshint": "^1.9.4",
+    "gulp-less": "^3.0.2",
+    "gulp-w3cjs": "^0.3.0",
+    "jshint-stylish": "^1.0.1",
+    "less-plugin-clean-css": "^1.5.0"
+  }
+}
