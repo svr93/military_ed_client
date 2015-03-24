@@ -11,6 +11,7 @@
   var r = null;
 
   var earthCtx = null;
+  var earth2DCtx = null;
 
   var bufferCnv = null;
   var bufferCtx = null;
@@ -39,16 +40,18 @@
 
   window.initEarthDrawingSettings = function() {
 
-    bufferCnv = document.createElement("canvas");
-    bufferCnv.width = 1000;
-    bufferCnv.height = bufferCnv.width / 2;
-    bufferCtx = bufferCnv.getContext("2d");
-
-    // document.body.appendChild(bufferCnv);
-
-    earthCnv.width = bufferCnv.width / 2;
-    earthCnv.height = bufferCnv.height;
+    earthCnv.width = parseInt(getComputedStyle(earthCnv, '').width);
+    earthCnv.height = earthCnv.width;
     earthCtx = earthCnv.getContext("2d");
+
+    earth2DCnv.width = earthCnv.width;
+    earth2DCnv.height = earthCnv.height;
+    earth2DCtx = earth2DCnv.getContext("2d");
+
+    bufferCnv = document.createElement("canvas");
+    bufferCnv.width = earthCnv.width * 2;
+    bufferCnv.height = earthCnv.height;
+    bufferCtx = bufferCnv.getContext("2d");
 
     img = new Image();
 
@@ -58,10 +61,15 @@
 
       setScaleSettings(INITIAL_SCALE);
 
+      earth2DCtx.drawImage(this, 0, 0,
+                                 this.width, this.height,
+                                 0, this.height / 4 | 0,
+                                 earth2DCnv.width, earth2DCnv.height / 2 | 0);
+
       setInterval(function() {
         window.requestAnimationFrame(drawEarth);
       }, DELAY_TIME);
-    }
+    };
 
     img.src = "img/earth.jpg";
 
@@ -73,14 +81,14 @@
       newScale = Math.round(newScale * 1000) / 1000;
       setScaleSettings(newScale);
     };
-  }
+  };
 
   function setScaleSettings(newScale) {
     currScale = newScale;
 
-    d2 = currScale * bufferCnv.width;
-    d = d2 / 2;
-    r = d2 / 4;
+    d2 = currScale * bufferCnv.width | 0;
+    d = d2 / 2 | 0;
+    r = d2 / 4 | 0;
 
     gaussPartWidth = d2 / GAUSS_PARTS_NUM;
   }
