@@ -5,7 +5,7 @@
 
   app.controller('EarthViewController', function() {
 
-    this.view = 2;
+    this.view = 3;
 
     this.isSet = function(value) {
       return this.view == value;
