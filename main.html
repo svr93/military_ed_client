@@ -47,7 +47,7 @@
 
       "use strict"; // is not supported in IE9
 
-      var isSystemWorking = false;
+      var isSystemWorking = true;
 
       function init() { // main script onload
 
@@ -64,7 +64,9 @@
           };
 
           startButton.onclick = function() {
-            begin();
+            this.style.display = "none";
+            
+            send();
           };
 
           var containerArr = document.getElementsByClassName("container");
@@ -78,7 +80,7 @@
         });
       }
 
-      function begin() { // startButton onclick
+      /* function begin() { // startButton onclick
         var xhr = new XMLHttpRequest();
 
         xhr.onreadystatechange = function() {
@@ -92,13 +94,14 @@
         "/ControlCenterService/fromControlCenter?latitude=34.5n&longitude=56.9e");
 
         xhr.send();
-      }
+      } */
     </script>
 
     <!--script defer src="js/satellitesDrawer-2.0.js"></script>
     <script defer src="js/earthDrawer.js"></script>
     <script defer src="bower_components/angular/angular.min.js"></script>
-    <script defer src="js/app.js" onload="init()"></script-->
+    <script defer src="js/app.js"></script>
+    <script defer src="js/sender.js" onload="init()"></script-->
     <script defer src="js/main.js" onload="init()"></script>
   </head>
 
@@ -116,6 +119,10 @@
       ng-show="ewc.isSet(1)"></canvas><!--
 
    --><div class="container" ng-show="ewc.isSet(2)">
+        <div id="coords"></div>
+      </div><!--
+
+   --><div class="container" ng-show="ewc.isSet(3)">
         <article>
           <h2>Инструкция</h2>
         </article>
@@ -149,6 +156,9 @@
               2D-карта Земли
             <br>
             <input type="radio" name="earthView" ng-model="ewc.view" value="2">
+              Список координат
+            <br>
+            <input type="radio" name="earthView" ng-model="ewc.view" value="3">
               Инструкция
           </form>
         </div>
