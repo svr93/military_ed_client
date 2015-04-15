@@ -16,9 +16,13 @@ function send() {
       return;
     }
 
-    coords.innerHTML = this.response;
+    var resText = this.responseText.replace(/,/g, ',\n');
+    coords.innerHTML = resText;
+
     setTimeout(send, DELAY_TIME);
   };
+
+  xhr.timeout = 3000;
 
   xhr.ontimeout = function() {
     setTimeout(send, DELAY_TIME);
