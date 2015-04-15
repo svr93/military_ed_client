@@ -52,6 +52,7 @@ gulp.task('js', function() {
   gulp.src([
     'js/satellitesDrawer-2.0.js',
     'js/earthDrawer.js',
+    'js/sender.js',
     'bower_components/angular/angular.min.js',
     'js/app.js'
   ])
