@@ -22,18 +22,21 @@ function getCoords() {
       return errCallback('Ошибка при получении координат');
     }
 
-    var res = JSON.parse(this.responseText);
+    if (this.responseText) {
 
-    if (res.error) {
-      var msg = res.error + '; ' + res.explanation;
-      return errCallback(msg);
+      var res = JSON.parse(this.responseText);
+
+      if (res.error) {
+        var msg = res.error + '; ' + res.explanation;
+        return errCallback(msg);
+      }
+
+      var resText = this.responseText.
+                      replace(/,/g, ',\n').
+                      replace(/\[/g, '[\n\n');
+
+      coords.innerHTML = resText;
     }
-
-    var resText = this.responseText.
-                    replace(/,/g, ',\n').
-                    replace(/\[/g, '[\n\n');
-
-    coords.innerHTML = resText;
 
     setTimeout(getCoords, DELAY_TIME);
   };
