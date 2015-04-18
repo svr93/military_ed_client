@@ -36,9 +36,11 @@ function getCoords() {
                       replace(/\[/g, '[\n\n');
 
       coords.innerHTML = resText;
-    }
 
-    setTimeout(getCoords, DELAY_TIME);
+      setTimeout(getCoords, DELAY_TIME);
+    } else {
+      return errCallback('Empty data');
+    }
   };
 
   xhr.ontimeout = function() {
