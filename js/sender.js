@@ -5,7 +5,7 @@
 function getCoords() {
   'use strict';
 
-  var DELAY_TIME = 500;
+  var DELAY_TIME = 1000;
 
   startButton.style.display = 'none';
   infoBlock.innerHTML = 'Выполняется получение координат';
@@ -31,11 +31,11 @@ function getCoords() {
 
     var resText = this.responseText.
                     replace(/,/g, ',\n').
-                    replace(/[/g, '[\n\n');
+                    replace(/\[/g, '[\n\n');
 
     coords.innerHTML = resText;
 
-    setTimeout(send, DELAY_TIME);
+    setTimeout(getCoords, DELAY_TIME);
   };
 
   xhr.ontimeout = function() {
