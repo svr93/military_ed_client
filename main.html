@@ -3,26 +3,33 @@
   <head>
     <title>Центр контроля</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=0.45">
+    <!-- content-width * max-scale > device-width because of 500px blocks -->
+    <meta name="viewport" content="width=device-width, maximum-scale=1">
 
-    <meta name="application-name" content="ControlCenter__v3.0">
+    <meta name="application-name" content="ControlCenter__v4.0">
     <meta name="author" content="Vladimir Shamsheev, svr93@i.ua">
 
+    <!-- to do:
+      1) exclude [].forEach;
+    -->
+
     <style>
+      /* 500px * 500px - my standard container size */
+
       body {
         text-align: center;
       }
       header {
         margin: auto;
-        width: 90%;
-        height: 45px;
-        border: 2px solid green;
+        /* width value in percents don't work */
+        width: 500px;
       }
+
       form {
         text-align: left;
       }
       input {
-        margin: 25px;
+        margin: 15px;
         width: 25px;
         height: 25px;
       }
@@ -30,79 +37,91 @@
         height: 50px;
         border-radius: 25px;
       }
+
       .container {
         display: inline-block;
         vertical-align: top;
-        width: 600px;
-        height: 600px;
+        width: 500px;
+        height: 500px;
         border: 2px solid green;
-      }
-      .button-block {
-        height: 50px;
       }
     </style>
 
     <script>
       // app requirements: IE9+ or other modern browsers
 
-      "use strict"; // is not supported in IE9
-
-      var isSystemWorking = true;
+      'use strict'; // is not supported in IE9
 
       function init() { // main script onload
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener('DOMContentLoaded', function() {
 
-          initEarthDrawingSettings();
+          // 1 real second = 100 model seconds
+          var TIME_COEFF = 100;
 
-          reduceScale.onclick = function() {
-            changeScale(-0.025);
-          };
+          initEarthDrawingSettings(TIME_COEFF);
 
-          increaseScale.onclick = function() {
-            changeScale(0.025);
-          };
+          var containerArr = document.getElementsByClassName('container');
 
-          startButton.onclick = function() {
-            this.style.display = "none";
-
-            send();
-          };
-
-          var containerArr = document.getElementsByClassName("container");
+          // need set new display style because of defer property (AngularJS)
 
           [].forEach.call(containerArr, function(item) {
-            item.style.display = "inline-block";
+            item.style.display = 'inline-block';
           });
 
-          buttonContainer.style.display = "block";
+          coords.style.height = parseInt(
+            getComputedStyle(coords.parentNode).height
+          ) - 20 + 'px';
+
+          setHandlers();
+
+          buttonContainer.style.display = 'block';
+
+          function setHandlers() {
+            reduceScale.onclick = function() {
+              changeScale(-0.025);
+            };
+
+            increaseScale.onclick = function() {
+              changeScale(0.025);
+            };
+
+            preventZoom();
+
+            startButton.onclick = function() {
+              getCoords();
+            };
+          }
+
+          function preventZoom() {
+
+            var buttonsArr = [
+              reduceScale,
+              increaseScale
+            ];
+
+            buttonsArr.forEach(setTouchStartHandler);
+          }
+
+          function setTouchStartHandler(item) {
+            item.addEventListener('touchstart', function(evt) {
+
+              evt.preventDefault();
+              item.onclick();
+            });
+          }
 
         });
       }
-
-      /* function begin() { // startButton onclick
-        var xhr = new XMLHttpRequest();
-
-        xhr.onreadystatechange = function() {
-          if (this.readyState != 4 || this.status != 200) return;
-
-          alert("Система работает, начинаем получение координат...");
-          isSystemWorking = true;
-        };
-
-        xhr.open("GET",
-        "/ControlCenterService/fromControlCenter?latitude=34.5n&longitude=56.9e");
-
-        xhr.send();
-      } */
     </script>
 
-    <!--script defer src="js/satellitesDrawer-2.0.js"></script>
-    <script defer src="js/earthDrawer.js"></script>
-    <script defer src="bower_components/angular/angular.min.js"></script>
-    <script defer src="js/app.js"></script>
-    <script defer src="js/sender.js" onload="init()"></script-->
-    <script defer src="js/main.js" onload="init()"></script>
+    <!-- script defer src="/js/sender.js"></script>
+    <script defer src="/js/satellitesDrawer-2.0.js"></script>
+    <script defer src="/js/earthDrawer.js"></script>
+    <script defer src="/bower_components/angular/angular.min.js"></script>
+    <script defer src="/js/app.js" onload="init()"></script -->
+
+    <script defer src="/js/main.js" onload="init()"></script>
   </head>
 
   <body ng-app="app">
@@ -119,7 +138,9 @@
       ng-show="ewc.isSet(1)"></canvas><!--
 
    --><div class="container" ng-show="ewc.isSet(2)">
-        <div id="coords"></div>
+        <textarea readonly id="coords"
+        style="width:90%; height:0; font-size:10px">
+        </textarea>
       </div><!--
 
    --><div class="container" ng-show="ewc.isSet(3)">
@@ -129,41 +150,38 @@
       </div><!--
 
    --><div class="container">
-        <div id="info_block" style="height:50px"></div>
+        <div id="infoBlock" style="height:50px"></div>
 
-        <div id="buttonContainer" style="display:none; margin:auto; width:50%">
-          <div class="button-block">
-            <button id="reduceScale" style="width:50%" ng-show="ewc.isSet(0)">
-              scale-
-            </button><!--
+        <div id="buttonContainer"
+        style="display:none; margin:auto; width:50%; height:125px">
 
-         --><button id="increaseScale" style="width:50%" ng-show="ewc.isSet(0)">
-              scale+
-            </button>
-          </div>
+          <button id="reduceScale" style="width:50%" ng-show="ewc.isSet(0)">
+            scale-
+          </button><!--
+       --><button id="increaseScale" style="width:50%" ng-show="ewc.isSet(0)">
+            scale+
+          </button>
           <br>
           <br>
           <button id="startButton" style="width:100%">
             Старт
           </button>
-          <br>
-          <br>
-          <form>
-            <input type="radio" name="earthView" ng-model="ewc.view" value="0">
-              3D-изображение Земли
-            <br>
-            <input type="radio" name="earthView" ng-model="ewc.view" value="1">
-              2D-карта Земли
-            <br>
-            <input type="radio" name="earthView" ng-model="ewc.view" value="2">
-              Список координат
-            <br>
-            <input type="radio" name="earthView" ng-model="ewc.view" value="3">
-              Инструкция
-          </form>
         </div>
+        <form>
+          <input type="radio" name="earthView" ng-model="ewc.view" value="0">
+            3D-изображение Земли
+          <br>
+          <input type="radio" name="earthView" ng-model="ewc.view" value="1">
+            2D-карта Земли
+          <br>
+          <input type="radio" name="earthView" ng-model="ewc.view" value="2">
+            Список координат
+          <br>
+          <input type="radio" name="earthView" ng-model="ewc.view" value="3">
+            Инструкция
+        </form>
       </div>
     </div>
   </body>
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="/css/main.css">
 </html>
