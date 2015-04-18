@@ -1,34 +1,54 @@
-function send() {
+/* to do:
+  1) add try-catch blocks instead of errCallback calling;
+*/
+
+function getCoords() {
   'use strict';
 
-  var DELAY_TIME = 1000;
+  var DELAY_TIME = 500;
+
+  startButton.style.display = 'none';
+  infoBlock.innerHTML = 'Выполняется получение координат';
 
   var xhr = new XMLHttpRequest();
 
   xhr.onreadystatechange = function() {
-    if (this.readyState != 4 || this.status != 200) { return; }
 
-    var res = JSON.parse(this.response);
-
-    if (res.error) {
-      alert(res.error + "; " + res.explanation);
-      startButton.style.display = 'inline-block';
+    if (this.readyState != 4 && this.status != 200) {
       return;
     }
 
-    var resText = this.responseText.replace(/,/g, ',\n');
+    if (this.readyState == 4 && this.status != 200) {
+      return errCallback('Ошибка при получении координат');
+    }
+
+    var res = JSON.parse(this.responseText);
+
+    if (res.error) {
+      var msg = res.error + '; ' + res.explanation;
+      return errCallback(msg);
+    }
+
+    var resText = this.responseText.
+                    replace(/,/g, ',\n').
+                    replace(/[/g, '[\n\n');
+
     coords.innerHTML = resText;
 
     setTimeout(send, DELAY_TIME);
   };
 
-  xhr.timeout = 3000;
-
   xhr.ontimeout = function() {
-    setTimeout(send, DELAY_TIME);
+    return errCallback('Control center server is not responding');
   };
 
-  xhr.open("GET", "/info");
+  xhr.open('GET', '/info');
 
   xhr.send();
+
+  function errCallback(msg) {
+    infoBlock.innerHTML = msg;
+    coords.innerHTML = 'error';
+    startButton.style.display = 'inline-block';
+  }
 }
