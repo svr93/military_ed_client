@@ -38,8 +38,6 @@ function getCoords() {
       coords.innerHTML = resText;
 
       setTimeout(getCoords, DELAY_TIME);
-    } else {
-      return errCallback('Empty data');
     }
   };
 
