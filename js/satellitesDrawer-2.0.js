@@ -37,15 +37,9 @@
 
   var coeff = null;
 
-  function getCoords() {
-    info_block.innerHTML = "Получение координат...";
-
-    // xhr
-  }
-
   window.drawSatellites = function (cnv, earthCurrPos, scale) {
 
-    getCoords();
+    // getCoords();
 
     ctx = ctx || cnv.getContext("2d");
 
