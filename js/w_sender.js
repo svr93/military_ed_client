@@ -52,7 +52,7 @@ onmessage = function(evt) {
   function errCallback(msg) {
 
     postMessage({
-      status: 1,
+      status: -1,
       res: msg
     });
   }
