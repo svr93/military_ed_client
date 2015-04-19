@@ -52,12 +52,20 @@ gulp.task('js', function() {
   gulp.src([
     'js/satellitesDrawer-2.0.js',
     'js/earthDrawer.js',
-    'js/sender.js',
+    //'js/sender.js',
     'bower_components/angular/angular.min.js',
     'js/app.js'
   ])
       .pipe(minifyJs())
       .pipe(concat('main.js'))
+      .pipe(checkJs())
+      .pipe(checkJs.reporter(styleOutput))
+      .pipe(gulp.dest('../client_prod/js'));
+
+  gulp.src([
+    'js/w_sender.js'
+  ])
+      .pipe(minifyJs())
       .pipe(checkJs())
       .pipe(checkJs.reporter(styleOutput))
       .pipe(gulp.dest('../client_prod/js'));
