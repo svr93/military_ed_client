@@ -54,6 +54,34 @@
 
       function init() { // main script onload
 
+        // init worker for XMLHttpRequest
+
+        var worker = new Worker('/js/w_sender.js');
+
+        worker.onmessage = function(evt) {
+
+          if (evt.data.status == -1) {
+
+            requestAnimationFrame(function() {
+              infoBlock.innerHTML = evt.data.res;
+              coords.value = 'error';
+              startButton.style.display = 'block';
+            });
+
+            return;
+          }
+
+          requestAnimationFrame(function() {
+            coords.value = evt.data.res;
+          });
+
+          worker.postMessage();
+        }
+
+        worker.onerror = function() {
+          infoBlock.innerHTML = "worker error";
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
 
           // 1 real second = 100 model seconds
@@ -89,7 +117,9 @@
             preventZoom();
 
             startButton.onclick = function() {
-              getCoords();
+              infoBlock.innerHTML = 'Получение координат';
+              this.style.display = 'none';
+              worker.postMessage();
             };
           }
 
@@ -115,8 +145,7 @@
       }
     </script>
 
-    <!-- script defer src="/js/sender.js"></script>
-    <script defer src="/js/satellitesDrawer-2.0.js"></script>
+    <!-- script defer src="/js/satellitesDrawer-2.0.js"></script>
     <script defer src="/js/earthDrawer.js"></script>
     <script defer src="/bower_components/angular/angular.min.js"></script>
     <script defer src="/js/app.js" onload="init()"></script -->
