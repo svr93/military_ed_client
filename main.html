@@ -54,6 +54,12 @@
 
       function init() { // main script onload
 
+        // need exclude the coords
+
+        var earth2DCtx = null;
+        var w = null;
+        var h = null;
+
         // init worker for XMLHttpRequest
 
         var worker = new Worker('/js/w_sender.js');
@@ -64,7 +70,7 @@
 
             requestAnimationFrame(function() {
               infoBlock.innerHTML = evt.data.res;
-              coords.value = 'error';
+              coordsTextArea.value = 'error';
               startButton.style.display = 'block';
             });
 
@@ -72,7 +78,27 @@
           }
 
           requestAnimationFrame(function() {
-            coords.value = evt.data.res;
+            coordsTextArea.value = evt.data.res;
+
+            var coords = JSON.parse(evt.data.res).coords;
+
+            coords.forEach(function(item) {
+              
+              var x = ((item.projection.longitude + 180) / 360) * w | 0;
+              var y = ((-item.projection.latitude + 180) / 360) * h | 0;
+
+              earth2DCtx.beginPath();
+
+              earth2DCtx.strokeStyle = 'red';
+
+              earth2DCtx.moveTo(x - 1, y - 1);
+              earth2DCtx.lineTo(x + 1, y + 1);
+
+              earth2DCtx.moveTo(x - 1, y + 1);
+              earth2DCtx.lineTo(x + 1, y - 1);
+
+              earth2DCtx.stroke();
+            });
           });
 
           worker.postMessage();
@@ -89,6 +115,10 @@
 
           initEarthDrawingSettings(TIME_COEFF);
 
+          earth2DCtx = earth2DCnv.getContext('2d');
+          w = earth2DCnv.width;
+          h = earth2DCnv.height;
+
           var containerArr = document.getElementsByClassName('container');
 
           // need set new display style because of defer property (AngularJS)
@@ -97,8 +127,8 @@
             item.style.display = 'inline-block';
           });
 
-          coords.style.height = parseInt(
-            getComputedStyle(coords.parentNode).height
+          coordsTextArea.style.height = parseInt(
+            getComputedStyle(coordsTextArea.parentNode).height
           ) - 20 + 'px';
 
           setHandlers();
@@ -167,7 +197,7 @@
       ng-show="ewc.isSet(1)"></canvas><!--
 
    --><div class="container" ng-show="ewc.isSet(2)">
-        <textarea readonly id="coords"
+        <textarea readonly id="coordsTextArea"
         style="width:90%; height:0; font-size:10px">
         </textarea>
       </div><!--
