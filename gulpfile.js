@@ -35,6 +35,10 @@ gulp.task('html', function() {
       }))
       .pipe(checkHtml())
       .pipe(gulp.dest('../client_prod'));
+
+  gulp.src('instruction.template')
+      .pipe(gulp.dest('../client_prod'));
+      
 });
 
 gulp.task('css', function() {
