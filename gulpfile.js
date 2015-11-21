@@ -19,6 +19,7 @@ var checkCss = require('gulp-csslint');
 var minifyJs = require('gulp-closure-compiler-service');
 var checkJs = require('gulp-jshint');
 var styleOutput = require('jshint-stylish');
+var babel = require('gulp-babel');
 
 /* ----- other plugins ----- */
 
@@ -72,6 +73,7 @@ gulp.task('js', function() {
     'bower_components/angular/angular.min.js',
     'js/app.js'
   ])
+      .pipe(babel({ presets: ['es2015'] }))
       .pipe(minifyJs())
       .pipe(concat('main.js'))
       .pipe(checkJs())
@@ -97,6 +99,7 @@ gulp.task('img', function() {
 gulp.task('watch', function() {
 
     gulp.watch('main.html', ['html']);
+    gulp.watch('js/**/*.js', ['js']);
 });
 
 gulp.task('connect', ['watch'], function() {
