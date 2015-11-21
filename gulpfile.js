@@ -79,26 +79,48 @@ gulp.task('css', function() {
 /* ~ js processing ~ */
 gulp.task('js', function() {
 
-    var IGNORE_CONCAT = 'w_sender.js';
+    var WORKER_FILE_PATH = 'js/w_sender.js';
+
+    /**
+     * Checks the need to concatenate current file with others.
+     * @param {Object} file
+     * @return {boolean}
+     */
+    var concatenationChecker = function(file) {
+
+        var path = file.path;
+
+        return (PRODUCTION &&
+            path.indexOf('bower_components/cesium') === -1 &&
+            path.indexOf('bower_components/requirejs') === -1 &&
+            path.indexOf(WORKER_FILE_PATH) === -1);
+    };
 
     var FILE_LIST = [
 
         'js/satellitesDrawer-2.0.js',
         'js/earthDrawer.js',
-        'bower_components*/**/*.min.js',
-        'bower_components*/**/require.js',
-        'js/app.js'
+
+        'bower_components*/**/*min.js',
+        'bower_components*/requirejs/require.js',
+        'bower_components*/cesium/**/*.js',
+
+        'js/app.js',
+        WORKER_FILE_PATH
     ];
-    FILE_LIST.push('js/' + IGNORE_CONCAT);
+
+    var NON_BOWER_FILE = '!bower_components/**/*.js';
 
     return gulp.src(FILE_LIST)
-        .pipe(gulpif('!' + '**/*.min.js', checkJs()))
-        .pipe(gulpif('!' + '**/*.min.js', checkJs.reporter(styleOutput)))
-        .pipe(gulpif('!' + '**/*.min.js', babel({ presets: ['es2015'] })))
-        .pipe(gulpif(PRODUCTION && '!' + '**/*.min.js', minifyJs()))
-        .pipe(gulpif(PRODUCTION && '!' + IGNORE_CONCAT, concat('main.js')))
+        .pipe(gulpif(NON_BOWER_FILE, checkJs()))
+        .pipe(gulpif(NON_BOWER_FILE, checkJs.reporter(styleOutput)))
+
+        .pipe(gulpif(NON_BOWER_FILE, babel({ presets: ['es2015'] })))
+        .pipe(gulpif(PRODUCTION && NON_BOWER_FILE, minifyJs()))
+
+        .pipe(gulpif(concatenationChecker, concat('main.js')))
         .pipe(gulpif(
-            '!' + 'bower_components/**/*.js',
+            NON_BOWER_FILE,
             gulp.dest(PRO_DIR_NAME + '/js'),
             gulp.dest(PRO_DIR_NAME)
         ))
