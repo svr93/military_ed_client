@@ -4,6 +4,7 @@ var gulp = require('gulp');
 
 var minifyHtml = require('gulp-html-minifier');
 var checkHtml = require('gulp-w3cjs');
+var htmlify = require('gulp-angular-htmlify');
 
 /* ----- css processing ----- */
 
@@ -44,7 +45,8 @@ gulp.task('html', function() {
         minifyCSS: true,
         minifyJS: true
       }))
-      // .pipe(checkHtml())
+      .pipe(htmlify())
+      .pipe(checkHtml())
       .pipe(gulp.dest('../client_prod'))
       .pipe(gulpif(CONNECT, connect.reload()));
 
