@@ -5,6 +5,7 @@ var gulp = require('gulp');
 var minifyHtml = require('gulp-html-minifier');
 var checkHtml = require('gulp-w3cjs');
 var htmlify = require('gulp-angular-htmlify');
+var replaceHtmlBlocks = require('gulp-html-replace');
 
 /* ----- css processing ----- */
 
@@ -40,6 +41,14 @@ var CONNECT = (process.argv.indexOf('connect') !== -1);
 
 gulp.task('html', function() {
   gulp.src('main.html')
+      .pipe(replaceHtmlBlocks({
+
+        'js': {
+
+            src: '/js/main.js',
+            tpl: '<script defer src="%s" onload="init()"></script>'
+        }
+      }))
       .pipe(minifyHtml({
         removeComments: true,
         minifyCSS: true,
@@ -107,7 +116,7 @@ gulp.task('connect', ['watch'], function() {
     return connect.server({
 
         root: PRO_DIR_NAME,
-        fallback: 'main.html',
+        fallback: PRO_DIR_NAME + '/main.html',
         livereload: true,
         port: 8001
     });
