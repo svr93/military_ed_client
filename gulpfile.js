@@ -36,6 +36,7 @@ var connect = require('gulp-connect');
 
 var PRO_DIR_NAME = '../client_prod';
 var CONNECT = (process.argv.indexOf('connect') !== -1);
+var PRODUCTION = (process.argv.indexOf('--production') !== -1);
 
 /* ----- tasks ----- */
 
@@ -43,20 +44,20 @@ var CONNECT = (process.argv.indexOf('connect') !== -1);
 gulp.task('html', function() {
 
     return gulp.src([ 'main.html', '*.template' ])
-        .pipe(replaceHtmlBlocks({
+        .pipe(gulpif(PRODUCTION, replaceHtmlBlocks({
 
             js: {
 
                 src: '/js/main.js',
                 tpl: '<script defer src="%s" onload="init()"></script>'
             }
-        }))
-        .pipe(minifyHtml({
+        })))
+        .pipe(gulpif(PRODUCTION, minifyHtml({
 
             removeComments: true,
             minifyCSS: true,
             minifyJS: true
-        }))
+        })))
         .pipe(htmlify())
         .pipe(gulpif('!' + '*.template', checkHtml()))
         .pipe(gulp.dest('../client_prod'))
@@ -76,7 +77,7 @@ gulp.task('css', function() {
 });
 
 /* ~ js processing ~ */
-gulp.task('js', function() { // TODO: add dev/pro check
+gulp.task('js', function() {
 
     var IGNORE_CONCAT = 'w_sender.js';
 
@@ -93,9 +94,13 @@ gulp.task('js', function() { // TODO: add dev/pro check
         .pipe(gulpif('!' + '*.min.js', checkJs()))
         .pipe(gulpif('!' + '*.min.js', checkJs.reporter(styleOutput)))
         .pipe(gulpif('!' + '*.min.js', babel({ presets: ['es2015'] })))
-        .pipe(gulpif('!' + '*.min.js', minifyJs()))
-        .pipe(gulpif('!' + IGNORE_CONCAT, concat('main.js')))
-        .pipe(gulp.dest('../client_prod/js'))
+        .pipe(gulpif(PRODUCTION && '!' + '*.min.js', minifyJs()))
+        .pipe(gulpif(PRODUCTION && '!' + IGNORE_CONCAT, concat('main.js')))
+        .pipe(gulpif(
+            '!' + 'angular.min.js',
+            gulp.dest(PRO_DIR_NAME + '/js'),
+            gulp.dest(PRO_DIR_NAME + '/bower_components/angular')
+        ))
         .pipe(gulpif(CONNECT, connect.reload()));
 });
 
