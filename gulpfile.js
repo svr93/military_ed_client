@@ -24,6 +24,14 @@ var styleOutput = require('jshint-stylish');
 
 var concat = require('gulp-concat');
 
+/* ~ deployment plugins ~ */
+
+var connect = require('gulp-connect');
+
+/* ~ base constants ~ */
+
+var PRO_DIR_NAME = '../client_prod';
+
 /* ----- tasks ----- */
 
 gulp.task('html', function() {
@@ -33,7 +41,7 @@ gulp.task('html', function() {
         minifyCSS: true,
         minifyJS: true
       }))
-      .pipe(checkHtml())
+      // .pipe(checkHtml())
       .pipe(gulp.dest('../client_prod'));
 
   gulp.src('instruction.template')
@@ -78,6 +86,16 @@ gulp.task('js', function() {
 gulp.task('img', function() {
   gulp.src('img/*.*') // need optimize
       .pipe(gulp.dest('../client_prod/img'));
+});
+
+gulp.task('connect', function() {
+
+    return connect.server({
+
+        root: PRO_DIR_NAME,
+        fallback: 'main.html',
+        livereload: true
+    });
 });
 
 gulp.task('default', ['html', 'css', 'js', 'img'], function() {});
