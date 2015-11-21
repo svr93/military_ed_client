@@ -23,6 +23,7 @@ var styleOutput = require('jshint-stylish');
 /* ----- other plugins ----- */
 
 var concat = require('gulp-concat');
+var gulpif = require('gulp-if');
 
 /* ~ deployment plugins ~ */
 
@@ -31,6 +32,7 @@ var connect = require('gulp-connect');
 /* ~ base constants ~ */
 
 var PRO_DIR_NAME = '../client_prod';
+var CONNECT = (process.argv.indexOf('connect') !== -1);
 
 /* ----- tasks ----- */
 
@@ -42,9 +44,10 @@ gulp.task('html', function() {
         minifyJS: true
       }))
       // .pipe(checkHtml())
-      .pipe(gulp.dest('../client_prod'));
+      .pipe(gulp.dest('../client_prod'))
+      .pipe(gulpif(CONNECT, connect.reload()));
 
-  gulp.src('instruction.template')
+  gulp.src('instruction.template') // TODO: replace to other task
       .pipe(gulp.dest('../client_prod'));
       
 });
@@ -57,7 +60,8 @@ gulp.task('css', function() {
       .pipe(concat('main.css'))
       .pipe(checkCss())
       .pipe(checkCss.reporter())
-      .pipe(gulp.dest('../client_prod/css'));
+      .pipe(gulp.dest('../client_prod/css'))
+      .pipe(gulpif(CONNECT, connect.reload()));
 });
 
 gulp.task('js', function() {
@@ -72,7 +76,8 @@ gulp.task('js', function() {
       .pipe(concat('main.js'))
       .pipe(checkJs())
       .pipe(checkJs.reporter(styleOutput))
-      .pipe(gulp.dest('../client_prod/js'));
+      .pipe(gulp.dest('../client_prod/js'))
+      .pipe(gulpif(CONNECT, connect.reload()));
 
   gulp.src([
     'js/w_sender.js'
@@ -80,7 +85,8 @@ gulp.task('js', function() {
       .pipe(minifyJs())
       .pipe(checkJs())
       .pipe(checkJs.reporter(styleOutput))
-      .pipe(gulp.dest('../client_prod/js'));
+      .pipe(gulp.dest('../client_prod/js'))
+      .pipe(gulpif(CONNECT, connect.reload()));
 });
 
 gulp.task('img', function() {
@@ -88,7 +94,12 @@ gulp.task('img', function() {
       .pipe(gulp.dest('../client_prod/img'));
 });
 
-gulp.task('connect', function() {
+gulp.task('watch', function() {
+
+    gulp.watch('main.html', ['html']);
+});
+
+gulp.task('connect', ['watch'], function() {
 
     return connect.server({
 
