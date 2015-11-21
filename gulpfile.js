@@ -85,21 +85,21 @@ gulp.task('js', function() {
 
         'js/satellitesDrawer-2.0.js',
         'js/earthDrawer.js',
-        'bower_components/angular/angular.min.js',
+        'bower_components/**/*.min.js',
         'js/app.js'
     ];
     FILE_LIST.push('js/' + IGNORE_CONCAT);
 
     return gulp.src(FILE_LIST)
-        .pipe(gulpif('!' + '*.min.js', checkJs()))
-        .pipe(gulpif('!' + '*.min.js', checkJs.reporter(styleOutput)))
-        .pipe(gulpif('!' + '*.min.js', babel({ presets: ['es2015'] })))
-        .pipe(gulpif(PRODUCTION && '!' + '*.min.js', minifyJs()))
+        .pipe(gulpif('!' + '**/*.min.js', checkJs()))
+        .pipe(gulpif('!' + '**/*.min.js', checkJs.reporter(styleOutput)))
+        .pipe(gulpif('!' + '**/*.min.js', babel({ presets: ['es2015'] })))
+        .pipe(gulpif(PRODUCTION && '!' + '**/*.min.js', minifyJs()))
         .pipe(gulpif(PRODUCTION && '!' + IGNORE_CONCAT, concat('main.js')))
         .pipe(gulpif(
-            '!' + 'angular.min.js',
+            '!' + '**/*.min.js',
             gulp.dest(PRO_DIR_NAME + '/js'),
-            gulp.dest(PRO_DIR_NAME + '/bower_components/angular')
+            gulp.dest(PRO_DIR_NAME + '/bower_components')
         ))
         .pipe(gulpif(CONNECT, connect.reload()));
 });
