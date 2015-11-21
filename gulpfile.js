@@ -85,7 +85,8 @@ gulp.task('js', function() {
 
         'js/satellitesDrawer-2.0.js',
         'js/earthDrawer.js',
-        'bower_components/**/*.min.js',
+        'bower_components*/**/*.min.js',
+        'bower_components*/**/require.js',
         'js/app.js'
     ];
     FILE_LIST.push('js/' + IGNORE_CONCAT);
@@ -97,9 +98,9 @@ gulp.task('js', function() {
         .pipe(gulpif(PRODUCTION && '!' + '**/*.min.js', minifyJs()))
         .pipe(gulpif(PRODUCTION && '!' + IGNORE_CONCAT, concat('main.js')))
         .pipe(gulpif(
-            '!' + '**/*.min.js',
+            '!' + 'bower_components/**/*.js',
             gulp.dest(PRO_DIR_NAME + '/js'),
-            gulp.dest(PRO_DIR_NAME + '/bower_components')
+            gulp.dest(PRO_DIR_NAME)
         ))
         .pipe(gulpif(CONNECT, connect.reload()));
 });
