@@ -105,7 +105,7 @@
             });
           });
 
-          worker.postMessage();
+          worker.postMessage(null);
         }
 
         worker.onerror = function() {
@@ -153,7 +153,7 @@
             startButton.onclick = function() {
               infoBlock.innerHTML = 'Получение координат';
               this.style.display = 'none';
-              worker.postMessage();
+              worker.postMessage(null);
             };
           }
 
