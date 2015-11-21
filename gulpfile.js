@@ -39,29 +39,28 @@ var CONNECT = (process.argv.indexOf('connect') !== -1);
 
 /* ----- tasks ----- */
 
+/* ~ html processing ~ */
 gulp.task('html', function() {
-  gulp.src('main.html')
-      .pipe(replaceHtmlBlocks({
 
-        'js': {
+    return gulp.src([ 'main.html', '*.template' ])
+        .pipe(replaceHtmlBlocks({
 
-            src: '/js/main.js',
-            tpl: '<script defer src="%s" onload="init()"></script>'
-        }
-      }))
-      .pipe(minifyHtml({
-        removeComments: true,
-        minifyCSS: true,
-        minifyJS: true
-      }))
-      .pipe(htmlify())
-      .pipe(checkHtml())
-      .pipe(gulp.dest('../client_prod'))
-      .pipe(gulpif(CONNECT, connect.reload()));
+            js: {
 
-  gulp.src('instruction.template') // TODO: replace to other task
-      .pipe(gulp.dest('../client_prod'));
-      
+                src: '/js/main.js',
+                tpl: '<script defer src="%s" onload="init()"></script>'
+            }
+        }))
+        .pipe(minifyHtml({
+
+            removeComments: true,
+            minifyCSS: true,
+            minifyJS: true
+        }))
+        .pipe(htmlify())
+        .pipe(gulpif('!' + '*.template', checkHtml()))
+        .pipe(gulp.dest('../client_prod'))
+        .pipe(gulpif(CONNECT, connect.reload()));
 });
 
 gulp.task('css', function() {
