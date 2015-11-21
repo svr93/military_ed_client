@@ -65,30 +65,28 @@ gulp.task('css', function() {
       .pipe(gulpif(CONNECT, connect.reload()));
 });
 
-gulp.task('js', function() {
-  gulp.src([
-    'js/satellitesDrawer-2.0.js',
-    'js/earthDrawer.js',
-    //'js/sender.js',
-    'bower_components/angular/angular.min.js',
-    'js/app.js'
-  ])
-      .pipe(babel({ presets: ['es2015'] }))
-      .pipe(minifyJs())
-      .pipe(concat('main.js'))
-      .pipe(checkJs())
-      .pipe(checkJs.reporter(styleOutput))
-      .pipe(gulp.dest('../client_prod/js'))
-      .pipe(gulpif(CONNECT, connect.reload()));
+/* ~ js processing ~ */
+gulp.task('js', function() { // TODO: add dev/pro check
 
-  gulp.src([
-    'js/w_sender.js'
-  ])
-      .pipe(minifyJs())
-      .pipe(checkJs())
-      .pipe(checkJs.reporter(styleOutput))
-      .pipe(gulp.dest('../client_prod/js'))
-      .pipe(gulpif(CONNECT, connect.reload()));
+    var IGNORE_CONCAT = 'w_sender.js';
+
+    var FILE_LIST = [
+
+        'js/satellitesDrawer-2.0.js',
+        'js/earthDrawer.js',
+        'bower_components/angular/angular.min.js',
+        'js/app.js'
+    ];
+    FILE_LIST.push('js/' + IGNORE_CONCAT);
+
+    return gulp.src(FILE_LIST)
+        .pipe(gulpif('!' + '*.min.js', checkJs()))
+        .pipe(gulpif('!' + '*.min.js', checkJs.reporter(styleOutput)))
+        .pipe(gulpif('!' + '*.min.js', babel({ presets: ['es2015'] })))
+        .pipe(gulpif('!' + '*.min.js', minifyJs()))
+        .pipe(gulpif('!' + IGNORE_CONCAT, concat('main.js')))
+        .pipe(gulp.dest('../client_prod/js'))
+        .pipe(gulpif(CONNECT, connect.reload()));
 });
 
 gulp.task('img', function() {
@@ -108,7 +106,8 @@ gulp.task('connect', ['watch'], function() {
 
         root: PRO_DIR_NAME,
         fallback: 'main.html',
-        livereload: true
+        livereload: true,
+        port: 8001
     });
 });
 
