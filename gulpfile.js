@@ -1,3 +1,6 @@
+// TODO: exclude cesiumWorkerBootstrapper.js
+// and other files from concatenating.
+
 var gulp = require('gulp');
 
 /* ----- html processing ----- */
