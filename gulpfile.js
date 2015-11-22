@@ -34,7 +34,7 @@ var connect = require('gulp-connect');
 
 /* ~ base constants ~ */
 
-var PRO_DIR_NAME = '../client_prod';
+var BUILD_DIR_NAME = '../client_prod';
 var CONNECT = (process.argv.indexOf('connect') !== -1);
 var PRODUCTION = (process.argv.indexOf('--production') !== -1);
 
@@ -123,8 +123,8 @@ gulp.task('js', function() {
         .pipe(gulpif(concatenationChecker, concat('main.js')))
         .pipe(gulpif(
             NON_BOWER_FILE,
-            gulp.dest(PRO_DIR_NAME + '/js'),
-            gulp.dest(PRO_DIR_NAME)
+            gulp.dest(BUILD_DIR_NAME + '/js'),
+            gulp.dest(BUILD_DIR_NAME)
         ))
         .pipe(gulpif(CONNECT, connect.reload()));
 });
@@ -144,8 +144,8 @@ gulp.task('connect', ['watch'], function() {
 
     return connect.server({
 
-        root: PRO_DIR_NAME,
-        fallback: PRO_DIR_NAME + '/main.html',
+        root: BUILD_DIR_NAME,
+        fallback: BUILD_DIR_NAME + '/main.html',
         livereload: true,
         port: 8001
     });
