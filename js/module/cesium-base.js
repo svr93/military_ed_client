@@ -11,4 +11,6 @@ export function initialize() {
     console.log(
         `ng version: ${ ng.version.full }, cs version: ${ cs.VERSION }`
     );
+    var viewer = new cs.Viewer('cesiumContainer', { animation: false });
+    viewer.resolutionScale = 0.5;
 }

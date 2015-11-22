@@ -42,12 +42,16 @@
         border-radius: 25px;
       }
 
-      .container {
+      .container, .container--cesium {
         display: inline-block;
         vertical-align: top;
         width: 500px;
         height: 500px;
         border: 2px solid green;
+      }
+
+      .container--cesium {
+        overflow: hidden;
       }
     </style>
 
@@ -217,7 +221,8 @@
           @[instruction]@
         </article>
       </div><!--
-
+   --><div class="container--cesium" id="cesiumContainer" ng-show="ewc.isSet(4)">
+      </div><!--
    --><div class="container">
         <div id="infoBlock" style="height:50px"></div>
 
@@ -248,6 +253,10 @@
           <br>
           <input type="radio" name="earthView" ng-model="ewc.view" value="3">
             Инструкция
+          <br>
+          <input type="radio" name="earthView" ng-model="ewc.view" value="4"
+          ng-change="ewc.onCesiumViewActive()">
+            Cesium
         </form>
       </div>
     </div>
