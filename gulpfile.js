@@ -121,7 +121,7 @@ gulp.task('js', function() {
         WORKER_FILE_PATH
     ];
 
-    if (!CONNECT) { FILE_LIST.push('bower_components*/cesium/Cesium/Cesium.js'); }
+    if (!CONNECT) { FILE_LIST.push('bower_components*/cesium/Cesium/**/*.js'); }
 
     var NON_BOWER_FILE = '!bower_components/**/*.js';
 
