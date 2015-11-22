@@ -103,11 +103,13 @@ gulp.task('js', function() {
 
         'bower_components*/**/*min.js',
         'bower_components*/requirejs/require.js',
-        'bower_components*/cesium/**/*.js',
 
         'js/app.js',
+        'js/module*/**/*.js',
         WORKER_FILE_PATH
     ];
+
+    if (!CONNECT) { FILE_LIST.push('bower_components*/cesium/**/*.js'); }
 
     var NON_BOWER_FILE = '!bower_components/**/*.js';
 
