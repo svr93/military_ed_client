@@ -96,6 +96,18 @@ gulp.task('js', function() {
             path.indexOf(WORKER_FILE_PATH) === -1);
     };
 
+    /**
+     * Checks the need to translate current file.
+     * @param  {Object} file
+     * @return {boolean}
+     */
+    var babelTranslationChecker = function(file) {
+
+        var path = file.path;
+
+        return (path.indexOf('js/module') !== -1);
+    };
+
     var FILE_LIST = [
 
         'js/satellitesDrawer-2.0.js',
@@ -117,7 +129,14 @@ gulp.task('js', function() {
         .pipe(gulpif(NON_BOWER_FILE, checkJs()))
         .pipe(gulpif(NON_BOWER_FILE, checkJs.reporter(styleOutput)))
 
-        .pipe(gulpif(NON_BOWER_FILE, babel({ presets: ['es2015'] })))
+        .pipe(gulpif(
+            babelTranslationChecker,
+            babel({
+
+                presets: ['es2015'],
+                plugins: ['transform-es2015-modules-amd']
+            })
+        ))
         .pipe(gulpif(PRODUCTION && NON_BOWER_FILE, minifyJs()))
 
         .pipe(gulpif(concatenationChecker, concat('main.js')))
