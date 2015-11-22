@@ -91,8 +91,8 @@ gulp.task('js', function() {
         var path = file.path;
 
         return (PRODUCTION &&
-            path.indexOf('bower_components/cesium') === -1 &&
             path.indexOf('bower_components/requirejs') === -1 &&
+            path.indexOf('js/module') === -1 &&
             path.indexOf(WORKER_FILE_PATH) === -1);
     };
 
@@ -121,7 +121,7 @@ gulp.task('js', function() {
         WORKER_FILE_PATH
     ];
 
-    if (!CONNECT) { FILE_LIST.push('bower_components*/cesium/**/*.js'); }
+    if (!CONNECT) { FILE_LIST.push('bower_components*/cesium/Cesium/Cesium.js'); }
 
     var NON_BOWER_FILE = '!bower_components/**/*.js';
 
