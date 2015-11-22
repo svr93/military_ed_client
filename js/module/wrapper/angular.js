@@ -1,11 +1,7 @@
-define(() => {
-    'use strict';
+'use strict';
 
-    /**
-     * Reference on AngularJS.
-     * @type {Object}
-     */
-    const ng = window.angular;
-
-    return Object.freeze(ng);
-});
+/**
+ * Reference on AngularJS.
+ * @type {Object}
+ */
+export const ng = window.angular;

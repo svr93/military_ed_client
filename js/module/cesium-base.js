@@ -1,16 +1,11 @@
-define(() => {
-    'use strict';
+'use strict';
 
-    /**
-     * Cesium part entry point.
-     */
-    function initialize() {
+import { ng } from 'js/module/wrapper/angular.js';
 
-        console.log('initialization successful');
-    }
+/**
+ * Cesium part entry point.
+ */
+export function initialize() {
 
-    return Object.freeze({
-
-        initialize: initialize
-    });
-});
+    console.log(`initialization successful; ng version: ${ ng.version.full }`);
+}
